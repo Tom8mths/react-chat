@@ -14,7 +14,25 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cors())
 
-const PORT = 3001
+app.post('/users', (req,res) => {
+  const { username } = req.body
+
+  chatkit
+  .createUser({
+    name: username,
+    id: username
+  })
+  .then(() => res.sendStatus(201))
+  .catch(error => {
+    if (error.error_type === 'services/chatkit/user_already_exists') {
+      res.sendStatus(200)
+    } else {
+      res.status(error.statusCode).json(error)
+    }
+  })
+})
+
+const PORT = 3000
 app.listen(PORT, err => {
   if (err) {
     console.error(err)
